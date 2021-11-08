@@ -14,7 +14,7 @@ pid {{ nginx_run_path }}/nginx.pid;
 include /etc/nginx/modules-enabled/*.conf;
 
 # Default error_log
-error_log {{ nginx_http_error_log | default(nginx_log_path + '/error.log') }};
+error_log {{ nginx_http_error_log | d(nginx_log_path + ('' if nginx_log_path.startswith('syslog:') else '/error.log')) }};
 
 # Nicenness, from 20 (nice) to -20 (not nice)
 worker_priority {{ nginx_worker_priority | default('0') }};
@@ -60,8 +60,8 @@ http {
 {%          set nginx_tpl_access_log_format = ' ' +  nginx_access_log_format %}
 {%      endif %}
         # Logging
-        access_log {{ nginx_http_access_log | default(nginx_log_path + '/access.log' + nginx_tpl_access_log_format) }};
-        error_log  {{ nginx_http_error_log  | default(nginx_log_path + '/error.log')  }};
+        access_log {{ nginx_http_access_log | d(nginx_log_path + ('' if nginx_log_path.startswith('syslog:') else '/access.log') + nginx_tpl_access_log_format) }};
+        error_log  {{ nginx_http_error_log  | d(nginx_log_path + ('' if nginx_log_path.startswith('syslog:') else '/error.log')) }};
 {% endblock %}
 
         add_header X-Clacks-Overhead "GNU Terry Pratchett";
